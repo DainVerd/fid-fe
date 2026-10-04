@@ -1,8 +1,8 @@
 <template>
   <v-app>
     <v-main>
-      <v-container class="py-8">
-        <h1 class="text-h4 mb-6">
+      <v-container class="py-8 mx-auto" style="max-width: 1400px; d-flex justify-center">
+        <h1 class=" text-h4 mb-6">
           Document Metadata
         </h1>
 
