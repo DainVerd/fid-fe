@@ -9,7 +9,7 @@
         <v-alert v-if="error" type="error" class="mb-4">
           {{ error }}
         </v-alert>
-
+        <DocumentMetadataFilters @apply="applyFilters" @clear="clearFilters" />
         <v-data-table-server :headers="headers" :items="documents" :items-length="totalCount" :loading="loading"
           :page="pagination.pageNumber" :items-per-page="pagination.pageSize" @update:page="handlePageChange"
           @update:sort-by="handleSortChange" @update:items-per-page="handleItemsPerPageChange">
@@ -55,17 +55,12 @@ import { formatDate } from './utils/dateFormatter';
 import { formatImportanceLevelName } from './utils/importanceformatter';
 import { formatCategoryName } from './utils/categoryFormatter';
 import { formatEstimateReadingMinutes } from './utils/estimateREadingMinutesFormatter';
+import DocumentMetadataFilters from '@/components/DocumentMetadataFilters.vue';
 
 const documents = ref<DocumentMetadata[]>([]);
 const totalCount = ref(0);
 const loading = ref(false);
 const error = ref<string | null>(null);
-const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([
-  {
-    key: 'createdAt',
-    order: 'desc',
-  },
-]);
 
 const pagination = ref<PaginationParams>({
   pageNumber: 1,
@@ -166,6 +161,19 @@ function handleSortChange(
 
   pagination.value.pageNumber = 1;
 
+  loadDocuments();
+}
+
+// filters logic
+function applyFilters(value: DocumentMetadataFilter): void {
+  filter.value = value;
+  pagination.value.pageNumber = 1;
+  loadDocuments();
+}
+
+function clearFilters(): void {
+  filter.value = {};
+  pagination.value.pageNumber = 1;
   loadDocuments();
 }
 
