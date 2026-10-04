@@ -12,7 +12,7 @@
 
         <v-data-table-server :headers="headers" :items="documents" :items-length="totalCount" :loading="loading"
           :page="pagination.pageNumber" :items-per-page="pagination.pageSize" @update:page="handlePageChange"
-          @update:items-per-page="handleItemsPerPageChange">
+          @update:sort-by="handleSortChange" @update:items-per-page="handleItemsPerPageChange">
           <template #item.createdAt="{ item }">
             {{ formatDate(item.createdAt, true) }}
           </template>
@@ -60,6 +60,12 @@ const documents = ref<DocumentMetadata[]>([]);
 const totalCount = ref(0);
 const loading = ref(false);
 const error = ref<string | null>(null);
+const sortBy = ref<{ key: string; order: 'asc' | 'desc' }[]>([
+  {
+    key: 'createdAt',
+    order: 'desc',
+  },
+]);
 
 const pagination = ref<PaginationParams>({
   pageNumber: 1,
@@ -71,14 +77,46 @@ const pagination = ref<PaginationParams>({
 const filter = ref<DocumentMetadataFilter>({});
 
 const headers = [
-  { title: 'Title', key: 'title' },
-  { title: 'Responsible unit', key: 'responsibleUnit' },
-  { title: 'Created at', key: 'createdAt' },
-  { title: 'File type', key: 'fileType' },
-  { title: 'Reading time', key: 'estimatedReadingMinutes' },
-  { title: 'Importance', key: 'importance' },
-  { title: 'Category', key: 'category' },
-  { title: 'Active', key: 'isActive' },
+  {
+    title: 'Title',
+    key: 'title',
+    sortable: true
+  },
+  {
+    title: 'Responsible unit',
+    key: 'responsibleUnit',
+    sortable: true
+  },
+  {
+    title: 'Created at',
+    key: 'createdAt',
+    sortable: true
+  },
+  {
+    title: 'File type',
+    key: 'fileType',
+    sortable: true
+  },
+  {
+    title: 'Reading time',
+    key: 'estimatedReadingMinutes',
+    sortable: true
+  },
+  {
+    title: 'Importance',
+    key: 'importance',
+    sortable: true
+  },
+  {
+    title: 'Category',
+    key: 'category',
+    sortable: true
+  },
+  {
+    title: 'Active',
+    key: 'isActive',
+    sortable: false
+  },
   { title: 'Document', key: 'url', sortable: false },
 ];
 
@@ -108,6 +146,24 @@ function handlePageChange(page: number): void {
 
 function handleItemsPerPageChange(pageSize: number): void {
   pagination.value.pageSize = pageSize;
+  pagination.value.pageNumber = 1;
+
+  loadDocuments();
+}
+
+function handleSortChange(
+  value: { key: string; order: 'asc' | 'desc' }[],
+): void {
+  const sort = value[0];
+
+  if (!sort) {
+    pagination.value.sortBy = undefined;
+    pagination.value.isDescending = false;
+  } else {
+    pagination.value.sortBy = sort.key;
+    pagination.value.isDescending = sort.order === 'desc';
+  }
+
   pagination.value.pageNumber = 1;
 
   loadDocuments();

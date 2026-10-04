@@ -1,6 +1,6 @@
 export const formatEstimateReadingMinutes = (minutes: number): string => {
   if (!minutes) return '—';
-  debugger;
+
   if (minutes < 60) return `${minutes} min`;
 
   let hours = 0;
